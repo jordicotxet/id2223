@@ -58,25 +58,29 @@ columns = [
            "chlorides",
            "free_sulfur_dioxide",
            "alcohol",
-           
+           "quality"
            ]
 
-X = df_features
+feat = df_features
+#feat = df_features.values
 v = wine_quality.data.targets.values.squeeze()
 v1 = np.select([v<6,v==6, v>6],[0,1,2])[:,None]
 y = pd.DataFrame(v1, columns=["quality"])
 
-X = pd.concat([X, y], axis = 1)
+feat = pd.concat([feat, y], axis = 1)
+#feat = np.concatenate((feat, y.values), axis=1)
 
+""" wine_fg = fs.get_or_create_feature_group(
+    name="wine",
+    version=1,
+    primary_key=columns, 
+    description="Dataset containing properties of different white wines and their respective qualities")
+wine_fg.delete() """
 wine_fg = fs.get_or_create_feature_group(
     name="wine",
     version=1,
     primary_key=columns, 
-    description="Dataset containing properties of different white wines are their repective quality")
-wine_fg.delete()
-wine_fg = fs.get_or_create_feature_group(
-    name="wine",
-    version=1,
-    primary_key=columns, 
-    description="Dataset containing properties of different white wines are their repective quality")
-wine_fg.insert(X)
+    description="Dataset containing properties of different white wines and their respective qualities")
+#wine_fg.save(X, write_options={"wait_for_job":True})
+wine_fg = wine_fg.insert(features=feat, overwrite=True, operation="insert", write_options={"wait_for_job":True})
+pass
