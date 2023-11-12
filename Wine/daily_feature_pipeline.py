@@ -1,13 +1,13 @@
 import os
 import modal
 
-LOCAL=True
+LOCAL=False
 
 if LOCAL == False:
-   stub = modal.Stub("wine_daily")
+   stub = modal.Stub(name = "wine_daily")
    image = modal.Image.debian_slim().pip_install(["hopsworks"]) 
 
-   @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
+   @stub.function(image=image, schedule=modal.Period(minutes=10), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
    def f():
        g()
 
@@ -54,6 +54,6 @@ if __name__ == "__main__":
     if LOCAL == True :
         g()
     else:
-        stub.deploy("wine_daily")
+        #modal.deploy()
         with stub.run():
-            f()
+            f.remote()

@@ -1,11 +1,11 @@
 import modal
     
-LOCAL=True
+LOCAL=False
 
 if LOCAL == False:
-   stub = modal.Stub()
-   hopsworks_image = modal.Image.debian_slim().pip_install(["hopsworks","joblib","seaborn","sklearn==1.1.1","dataframe-image"])
-   @stub.function(image=hopsworks_image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
+   stub = modal.Stub("Daily_Batch_Inference")
+   hopsworks_image = modal.Image.debian_slim().pip_install(["hopsworks","joblib","seaborn","scikit-learn==1.1.1","dataframe-image"])
+   @stub.function(image=hopsworks_image,  schedule=modal.Period(minutes=30), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
    def f():
        g()
 
@@ -113,6 +113,7 @@ if __name__ == "__main__":
     if LOCAL == True :
         g()
     else:
+        #stub.deploy("Daily_Batch_Inference")
         with stub.run():
-            f()
+            f.remote()
 

@@ -7,10 +7,10 @@ fs = project.get_feature_store()
 
 dataset_api = project.get_dataset_api()
 
-dataset_api.download("Resources/images/latest_wine.png")
-dataset_api.download("Resources/images/actual_wine.png")
-dataset_api.download("Resources/images/df_wine_recent.png")
-dataset_api.download("Resources/images/wine_confusion_matrix.png")
+dataset_api.download("Resources/images/latest_wine.png", overwrite=True)
+dataset_api.download("Resources/images/actual_wine.png", overwrite=True)
+dataset_api.download("Resources/images/df_wine_recent.png", overwrite=True)
+dataset_api.download("Resources/images/wine_confusion_matrix.png", overwrite=True)
 
 with gr.Blocks() as demo:
     with gr.Row():

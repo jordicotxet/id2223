@@ -14,7 +14,7 @@ fs = project.get_feature_store()
 mr = project.get_model_registry()
 model = mr.get_model("wine_model", version=1)
 model_dir = model.download()
-model = joblib.load(model_dir + "/wine_model.json")
+model = joblib.load(model_dir + "/wine_model.pkl")
 print("Model downloaded")
 
 def wine(volatile_acidity,
@@ -33,7 +33,7 @@ def wine(volatile_acidity,
     # the first element.
 #     print("Res: {0}").format(res)
     print(res[0])
-    wine_url = "https://github.com/jordicotxet/id2223/blob/63fe7d525afa1cfb626c9fa7513e2cc886e22d41/Wine/wine_dataset/" + str(res[0]) + ".jpg?raw=true"
+    wine_url = "https://github.com/jordicotxet/id2223/blob/63fe7d525afa1cfb626c9fa7513e2cc886e22d41/Wine/wine_dataset/" + str(int(res[0])) + ".jpg?raw=true"
     print(wine_url)
     img = Image.open(requests.get(wine_url, stream=True).raw)  
     return img
@@ -50,7 +50,7 @@ demo = gr.Interface(
         gr.Slider(minimum=0, maximum=400, step=1, value=35, label="free_sulfur_dioxide"),
         gr.Slider(minimum=2, maximum=15, step=0.1, value=10.6, label="alcohol (in %)"),
         ],
-    examples=[[0.5, 0.8, 0.034, 46, 9.2],[0.42, 4.1, 0.03, 31, 12.8], [0.7, 67.1, 0.219, 275, 10.7]],
+    examples=[[0.5, 0.8, 0.034, 46, 9.2],[0.42, 4.1, 0.03, 31, 12.8], [0.7, 67.1, 0.219, 275, 12.9]],
     outputs=gr.Image(type="pil", height=400, width=400))
 
 demo.launch(debug=True)
