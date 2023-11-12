@@ -12,65 +12,48 @@ if LOCAL == False:
        g()
 
 
-def generate_wine(name):
+def generate_wine(stats):
     """
     Returns a single iris flower as a single row in a DataFrame
     """
     import pandas as pd
     import random
 
-    df = pd.DataFrame({ "sepal_length": [random.uniform(sepal_len_max, sepal_len_min)],
-                       "sepal_width": [random.uniform(sepal_width_max, sepal_width_min)],
-                       "petal_length": [random.uniform(petal_len_max, petal_len_min)],
-                       "petal_width": [random.uniform(petal_width_max, petal_width_min)]
-                      })
-    df['variety'] = name
+    df_dict = {}
+
+    for row in stats:
+        df_dict[row['column']] = [random.gauss(row['mean'], row['stdDev'])]
+
+    df = pd.DataFrame(df_dict)
     return df
 
-
-def get_random_iris_flower():
-    """
-    Returns a DataFrame containing one random iris flower
-    """
-    import pandas as pd
-    import random
-
-    virginica_df = generate_flower("Virginica", 8, 5.5, 3.8, 2.2, 7, 4.5, 2.5, 1.4)
-    versicolor_df = generate_flower("Versicolor", 7.5, 4.5, 3.5, 2.1, 3.1, 5.5, 1.8, 1.0)
-    setosa_df =  generate_flower("Setosa", 6, 4.5, 4.5, 2.3, 1.2, 2, 0.7, 0.3)
-
-    # randomly pick one of these 3 and write it to the featurestore
-    pick_random = random.uniform(0,3)
-    if pick_random >= 2:
-        iris_df = virginica_df
-        print("Virginica added")
-    elif pick_random >= 1:
-        iris_df = versicolor_df
-        print("Versicolor added")
-    else:
-        iris_df = setosa_df
-        print("Setosa added")
-
-    return iris_df
 
 
 def g():
     import hopsworks
     import pandas as pd
+    import pandas as pd
+    import random
 
     project = hopsworks.login()
     fs = project.get_feature_store()
 
-    iris_df = get_random_iris_flower()
+    quality = 0
+    print("Adding wine of quality", quality)
+    name = "wine_subset_" + str(quality)
+    stat_fg = fs.get_feature_group(name=name, version=1)
+    stats = stat_fg.get_statistics().content['columns']
 
-    iris_fg = fs.get_feature_group(name="iris",version=1)
-    iris_fg.insert(iris_df)
+    wine = generate_wine(stats)
+
+    wine_fg = fs.get_feature_group(name="wine",version=1)
+    wine_fg.insert(wine)
     
 
 if __name__ == "__main__":
     if LOCAL == True :
         g()
     else:
-        stub.deploy("iris_daily")
+        stub.deploy("wine_daily")
         with stub.run():
             f()
