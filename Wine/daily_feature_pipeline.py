@@ -38,7 +38,7 @@ def g():
     project = hopsworks.login()
     fs = project.get_feature_store()
 
-    quality = 0
+    quality = random.randint(0,2)
     print("Adding wine of quality", quality)
     name = "wine_subset_" + str(quality)
     stat_fg = fs.get_feature_group(name=name, version=1)
