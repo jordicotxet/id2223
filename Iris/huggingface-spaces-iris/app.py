@@ -6,7 +6,7 @@ import hopsworks
 import joblib
 import pandas as pd
 
-project = hopsworks.login(api_key_value="PPrSs0gAP9pypXYI.IMztBy9tzA0NJva8UbGD0InDXyXFbCci2iX67kXCHLYyLjc9aQXqyhWOcTAwtJ1Z")
+project = hopsworks.login()
 fs = project.get_feature_store()
 
 

@@ -1,4 +1,3 @@
-import os
 import modal
     
 LOCAL=True
@@ -16,10 +15,9 @@ def g():
     import joblib
     import datetime
     from PIL import Image
-    from datetime import datetime, timedelta
+    from datetime import datetime
     import dataframe_image as dfi
     from sklearn.metrics import confusion_matrix
-    from matplotlib import pyplot
     import seaborn as sns
     import requests
 
@@ -39,7 +37,7 @@ def g():
     
     
     mr = project.get_model_registry()
-    model = mr.get_model("wine_model")
+    model = mr.get_model("wine_model", version = 1)
     model_dir = model.download()
     model = joblib.load(model_dir + "/wine_model.pkl")
     
@@ -88,8 +86,8 @@ def g():
 
 
     df_recent = history_df.tail(4)
-    dfi.export(df_recent, './df_recent.png', table_conversion = 'matplotlib')
-    dataset_api.upload("./df_recent.png", "Resources/images", overwrite=True)
+    dfi.export(df_recent, './df_wine_recent.png', table_conversion = 'matplotlib')
+    dataset_api.upload("./df_wine_recent.png", "Resources/images", overwrite=True)
     
     predictions = history_df[['prediction']]
     labels = history_df[['label']]
@@ -104,8 +102,8 @@ def g():
 
         cm = sns.heatmap(df_cm, annot=True)
         fig = cm.get_figure()
-        fig.savefig("./confusion_matrix.png")
-        dataset_api.upload("./confusion_matrix.png", "Resources/images", overwrite=True)
+        fig.savefig("./wine_confusion_matrix.png")
+        dataset_api.upload("./wine_confusion_matrix.png", "Resources/images", overwrite=True)
     else:
         print("You need 3 different wine predictions to create the confusion matrix.")
         print("Run the batch inference pipeline more times until you get 3 different wine quality predictions") 

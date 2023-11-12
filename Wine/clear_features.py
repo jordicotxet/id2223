@@ -1,19 +1,6 @@
-from ucimlrepo import fetch_ucirepo 
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import hopsworks
 
-from sklearn.model_selection import train_test_split
-from sklearn import preprocessing
-from sklearn.metrics import accuracy_score
-from xgboost import XGBClassifier, plot_importance
-import xgboost as xgb
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from imblearn.over_sampling import SMOTE, RandomOverSampler
-from collections import Counter
-import numpy as np
-from sklearn.model_selection import RepeatedStratifiedKFold, RandomizedSearchCV
+
 
 project = hopsworks.login()
 fs = project.get_feature_store()
