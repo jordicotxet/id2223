@@ -17,7 +17,8 @@ import joblib
 import os
 from hsml.schema import Schema
 from hsml.model_schema import ModelSchema
-
+from sklearn.metrics import confusion_matrix
+import sklearn
 import numpy as np
 
 
@@ -35,23 +36,23 @@ feature_view = fs.get_or_create_feature_view(
 
 # You can read training data, randomly split into train/test sets of features (X) and labels (y)        
 X_train, X_test, y_train, y_test = feature_view.train_test_split(0.1)
-#X = pd.concat([X_train, X_test], axis = 0)
-clf = XGBClassifier()
-param_dist = {
-    "n_estimators":[5,20,100,500],
-    "max_depth":[1,3,5,7,9],
-    "learning_rate":[0.01,0.1,1,10,100]
-}
-cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=10)
+X = pd.concat([X_train, X_test], axis = 0)
+y = pd.concat([y_train, y_test], axis = 0)
 
-RCV = RandomizedSearchCV(clf, param_dist, n_iter=50, scoring='f1_weighted', n_jobs=-1, cv=2)
-clf = RCV.fit(X_train.values, y_train.values.ravel()).best_estimator_
-clf.save_model("clf.json")
-clf.load_model("clf.json")
-preds = clf.predict(X_test)
-accuracy = accuracy_score(y_test, preds)
-from sklearn.metrics import confusion_matrix
-print(confusion_matrix(y_test, preds))
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, stratify=y)
+
+""" clf = sklearn.svm.SVC(C=1, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape='ovr', degree=3, gamma=0.5, kernel='rbf',
+  max_iter=-1, probability=False, random_state=8, shrinking=True,
+  tol=0.001, verbose=False) """
+
+clf = RandomForestClassifier(n_estimators=2000, max_depth=12)
+
+clf.fit(X_train, y_train)
+predicted = clf.predict(X_test)
+accuracy = accuracy_score(y_test, predicted)
+
+print(confusion_matrix(y_test, predicted))
 print(accuracy)
 
 # We will now upload our model to the Hopsworks Model Registry. First get an object for the model registry.
@@ -63,7 +64,7 @@ if os.path.isdir(model_dir) == False:
     os.mkdir(model_dir)
 
 # Save both our model and the confusion matrix to 'model_dir', whose contents will be uploaded to the model registry
-joblib.dump(clf, model_dir + "/wine_model.json")
+joblib.dump(clf, model_dir + "/wine_model.pkl")
 #fig.savefig(model_dir + "/confusion_matrix.png")    
 
 # Specify the schema of the model's input/output using the features (X_train) and labels (y_train)

@@ -15,32 +15,12 @@ from collections import Counter
 import numpy as np
 from sklearn.model_selection import RepeatedStratifiedKFold, RandomizedSearchCV
 
-project = hopsworks.login()
-fs = project.get_feature_store()
+wine_quality = pd.read_csv("Wine/winequality/winequality-white.csv", sep=";")
 
-wine_quality = fetch_ucirepo(id=186) 
+#wine_quality = fetch_ucirepo(id=186) 
 
-def visualize_dataset(features, targets, columns):
-    fig, axis = plt.subplots(3, 4)
-    c = 0
-    for i in range(3):
-        for j in range(4):
-            if c == 11:
-                break
-            axis[i,j].title.set_text(columns[c])
-            features[columns[c]].hist(bins = 20, ax = axis[i,j])
-            c += 1
-    axis[2,3].title.set_text("quality")
-    targets["quality"].hist(bins = 20, ax = axis[2,3])
-    plt.show()
-
-
-#visualize_dataset(wine_quality.data.features, wine_quality.data.targets, columns)
-
-project = hopsworks.login()
-fs = project.get_feature_store()
-
-df_features = wine_quality.data.features
+#df_features = pd.concat([wine_quality.data.features, wine_quality.data.targets], axis = 1)
+df_features = wine_quality
 
 drop_col = ["fixed_acidity",
            "citric_acid",
@@ -51,6 +31,8 @@ drop_col = ["fixed_acidity",
            ]
 
 df_features.drop(columns = drop_col, inplace = True)
+df_features.drop_duplicates(inplace = True)
+X, y = df_features.iloc[:,:-1], df_features.iloc[:,-1:]
 
 columns = [
            "volatile_acidity",
@@ -61,26 +43,52 @@ columns = [
            "quality"
            ]
 
-feat = df_features
-#feat = df_features.values
-v = wine_quality.data.targets.values.squeeze()
+
+v = y.values.squeeze()
 v1 = np.select([v<6,v==6, v>6],[0,1,2])[:,None]
 y = pd.DataFrame(v1, columns=["quality"])
 
-feat = pd.concat([feat, y], axis = 1)
-#feat = np.concatenate((feat, y.values), axis=1)
+X_val = X.values
+y_val = y.values
+df_data = np.concatenate((X_val, y_val), axis = 1)
 
-""" wine_fg = fs.get_or_create_feature_group(
-    name="wine",
-    version=1,
-    primary_key=columns, 
-    description="Dataset containing properties of different white wines and their respective qualities")
-wine_fg.delete() """
+df = pd.DataFrame(df_data, columns=columns)
+
+grouping = df.groupby('quality')
+stats = {}
+
+v2 = None 
+
+project = hopsworks.login()
+fs = project.get_feature_store()
+
 wine_fg = fs.get_or_create_feature_group(
     name="wine",
     version=1,
     primary_key=columns, 
     description="Dataset containing properties of different white wines and their respective qualities")
-#wine_fg.save(X, write_options={"wait_for_job":True})
-wine_fg = wine_fg.insert(features=feat, overwrite=True, operation="insert", write_options={"wait_for_job":True})
-pass
+#wine_fg.delete()
+wine_fg.insert(df)
+
+for key in grouping.groups.keys():
+    #AA = "wine_stats_" + str(int(n))
+    fg = fs.get_or_create_feature_group(
+    name="wine_subset_" + str(int(key)),
+    version=1,
+    primary_key=columns, 
+    description="Wine that belong to quality group: " +  str(key),
+    parents=[wine_fg])
+    v1 = grouping.get_group(key)
+    #v2 = v1.loc['mean']
+    #fg.delete()
+    fg.insert(v1)
+    #for i, ii in zip(v2.index, v2):
+    #    pass
+    #v2 = v1.values[1:3,:] if v2 is None else np.concatenate((v1.values[1:3,:], v2), axis = 0)
+
+#v2 = np.concatenate((v2, np.arange(3).repeat(2)[:, None]))
+
+
+
+
+
