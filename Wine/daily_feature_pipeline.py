@@ -7,7 +7,7 @@ if LOCAL == False:
    stub = modal.Stub(name = "wine_daily")
    image = modal.Image.debian_slim().pip_install(["hopsworks"]) 
 
-   @stub.function(image=image, schedule=modal.Period(minutes=10), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
+   @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
    def f():
        g()
 

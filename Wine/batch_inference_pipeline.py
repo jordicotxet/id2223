@@ -5,7 +5,7 @@ LOCAL=False
 if LOCAL == False:
    stub = modal.Stub("Daily_Batch_Inference")
    hopsworks_image = modal.Image.debian_slim().pip_install(["hopsworks","joblib","seaborn","scikit-learn==1.1.1","dataframe-image"])
-   @stub.function(image=hopsworks_image,  schedule=modal.Period(minutes=30), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
+   @stub.function(image=hopsworks_image,  schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
    def f():
        g()
 
@@ -86,6 +86,7 @@ def g():
 
 
     df_recent = history_df.tail(4)
+    #v = df_recent.iloc[:,1:]
     dfi.export(df_recent, './df_wine_recent.png', table_conversion = 'matplotlib')
     dataset_api.upload("./df_wine_recent.png", "Resources/images", overwrite=True)
     
@@ -94,7 +95,7 @@ def g():
 
     print("Number of different wine predictions to date: " + str(predictions.value_counts().count()))
     if predictions.value_counts().count() == 3:
-        results = confusion_matrix(labels, predictions)
+        results = confusion_matrix(labels, predictions, normalize='all')
 
         df_cm = pd.DataFrame(results, 
                                 ['0', '1', '2'],
