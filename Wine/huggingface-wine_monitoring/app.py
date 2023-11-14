@@ -1,31 +1,36 @@
 import gradio as gr
-from PIL import Image
 import hopsworks
+from PIL import Image
 
 project = hopsworks.login()
-fs = project.get_feature_store()
 
-dataset_api = project.get_dataset_api()
+class ImageLoad:
+    def __init__(self, path, project) -> None:
+        self.path = path
+        self.image_name = path[path.rfind('/') + 1:]
+        self.project = project
 
-dataset_api.download("Resources/images/latest_wine.png", overwrite=True)
-dataset_api.download("Resources/images/actual_wine.png", overwrite=True)
-dataset_api.download("Resources/images/df_wine_recent.png", overwrite=True)
-dataset_api.download("Resources/images/wine_confusion_matrix.png", overwrite=True)
+    def __call__(self):
+        dataset_api = self.project.get_dataset_api()
+        dataset_api.download(self.path, overwrite=True)
+        return Image.open(self.image_name)
+
+
 
 with gr.Blocks() as demo:
     with gr.Row():
       with gr.Column():
           gr.Label("Today's Predicted Image")
-          input_img = gr.Image("latest_wine.png", elem_id="predicted-img")
+          input_img = gr.Image(value=ImageLoad("Resources/images/latest_wine.png", project), elem_id="predicted-img")
       with gr.Column():          
           gr.Label("Today's Actual Image")
-          input_img = gr.Image("actual_wine.png", elem_id="actual-img")        
+          input_img = gr.Image(value=ImageLoad("Resources/images/actual_wine.png", project), elem_id="actual-img")        
     with gr.Row():
       with gr.Column():
           gr.Label("Recent Prediction History")
-          input_img = gr.Image("df_wine_recent.png", elem_id="recent-predictions")
+          input_img = gr.Image(value=ImageLoad("Resources/images/df_wine_recent.png", project), elem_id="recent-predictions")
       with gr.Column():          
-          gr.Label("Confusion Maxtrix with Historical Prediction Performance")
-          input_img = gr.Image("wine_confusion_matrix.png", elem_id="confusion-matrix")        
+          gr.Label("Confusion Maxtrix with Historical Prediction Performance")  
+          input_img = gr.Image(value=ImageLoad("Resources/images/wine_confusion_matrix.png", project), elem_id="recent-predictions")
 
-demo.launch()
+demo.launch(share = True)

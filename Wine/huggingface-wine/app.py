@@ -1,9 +1,7 @@
 import gradio as gr
-#from gradio.components import inputs
 from PIL import Image
 import requests
 import hopsworks
-import io
 import joblib
 import pandas as pd
 
@@ -31,7 +29,6 @@ def wine(volatile_acidity,
     res = model.predict(df) 
     # We add '[0]' to the result of the transformed 'res', because 'res' is a list, and we only want 
     # the first element.
-#     print("Res: {0}").format(res)
     print(res[0])
     wine_url = "https://github.com/jordicotxet/id2223/blob/63fe7d525afa1cfb626c9fa7513e2cc886e22d41/Wine/wine_dataset/" + str(int(res[0])) + ".jpg?raw=true"
     print(wine_url)
@@ -53,5 +50,5 @@ demo = gr.Interface(
     examples=[[0.5, 0.8, 0.034, 46, 9.2],[0.42, 4.1, 0.03, 31, 12.8], [0.7, 67.1, 0.219, 275, 12.9]],
     outputs=gr.Image(type="pil", height=400, width=400))
 
-demo.launch(debug=True)
+demo.launch(share = True)
  

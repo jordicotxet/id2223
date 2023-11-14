@@ -67,7 +67,7 @@ if os.path.isdir(model_dir) == False:
 joblib.dump(clf, model_dir + "/wine_model.pkl")
 #fig.savefig(model_dir + "/confusion_matrix.png")    
 
-# Specify the schema of the model's input/output using the features (X_train) and labels (y_train)
+""" # Specify the schema of the model's input/output using the features (X_train) and labels (y_train)
 input_schema = Schema(X_train)
 output_schema = Schema(y_train)
 model_schema = ModelSchema(input_schema, output_schema)
@@ -81,4 +81,4 @@ wine_model = mr.python.create_model(
 )
 
 # Upload the model to the model registry, including all files in 'model_dir'
-wine_model.save(model_dir)
+wine_model.save(model_dir) """

@@ -31,8 +31,9 @@ def g():
                                     description="Read from wine dataset",
                                     labels=["quality"],
                                     query=query)
+    
 
-    #feature_view = fs.get_or_create_feature_view(name="wine", version=1)
+    #get features added the last day
     batch_data = feature_view.get_batch_data()
     
     
@@ -40,11 +41,9 @@ def g():
     model = mr.get_model("wine_model", version = 1)
     model_dir = model.download()
     model = joblib.load(model_dir + "/wine_model.pkl")
-    
-    #get features added the last day
-    
     y_pred = model.predict(batch_data)
-    #print(y_pred)
+
+    
     offset = 1
     wine_quality = int(y_pred[y_pred.size-offset])
     wine_url = "https://github.com/jordicotxet/id2223/blob/63fe7d525afa1cfb626c9fa7513e2cc886e22d41/Wine/wine_dataset/" + str(wine_quality) + ".jpg?raw=true"
@@ -56,7 +55,6 @@ def g():
    
     wine_fg = fs.get_feature_group(name="wine", version=1)
     df = wine_fg.read() 
-    #print(df)
     label = int(df.iloc[-offset]["quality"])
     label_url = "https://github.com/jordicotxet/id2223/blob/63fe7d525afa1cfb626c9fa7513e2cc886e22d41/Wine/wine_dataset/" + str(label) + ".jpg?raw=true"
     print("Wine actual: ",label)
@@ -69,7 +67,7 @@ def g():
                                                 primary_key=["datetime"],
                                                 description="White Wine Prediction/Outcome Monitoring"
                                                 )
-    
+        
     now = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
     data = {
         'prediction': [wine_quality],
@@ -86,8 +84,7 @@ def g():
 
 
     df_recent = history_df.tail(4)
-    #v = df_recent.iloc[:,1:]
-    dfi.export(df_recent, './df_wine_recent.png', table_conversion = 'matplotlib')
+    dfi.export(df_recent.style.hide(axis='index'), './df_wine_recent.png', table_conversion = 'matplotlib')
     dataset_api.upload("./df_wine_recent.png", "Resources/images", overwrite=True)
     
     predictions = history_df[['prediction']]
@@ -98,10 +95,11 @@ def g():
         results = confusion_matrix(labels, predictions, normalize='all')
 
         df_cm = pd.DataFrame(results, 
-                                ['0', '1', '2'],
-                                ['0', '1', '2'])
+                                ['Poor', 'Average', 'Good'],
+                                ['Poor', 'Average', 'Good'])
 
         cm = sns.heatmap(df_cm, annot=True)
+        cm.set(xlabel='Predicted', ylabel='Actual')
         fig = cm.get_figure()
         fig.savefig("./wine_confusion_matrix.png")
         dataset_api.upload("./wine_confusion_matrix.png", "Resources/images", overwrite=True)
@@ -114,7 +112,6 @@ if __name__ == "__main__":
     if LOCAL == True :
         g()
     else:
-        #stub.deploy("Daily_Batch_Inference")
         with stub.run():
             f.remote()
 

@@ -14,7 +14,7 @@ if LOCAL == False:
 
 def generate_wine(stats):
     """
-    Returns a single iris flower as a single row in a DataFrame
+    Returns randomly generated wine of a particular quality based on its statistics 
     """
     import pandas as pd
     import random
@@ -22,7 +22,7 @@ def generate_wine(stats):
     df_dict = {}
 
     for row in stats:
-        df_dict[row['column']] = [random.gauss(row['mean'], row['stdDev'])]
+        df_dict[row['column']] = [max(0.0,random.gauss(row['mean'], row['stdDev']))]
 
     df = pd.DataFrame(df_dict)
     return df
