@@ -10,3 +10,5 @@ gradio==3.14
 ucimlrepo==0.0.3
 xgboost
 imblearn
+huggingface_hub 
+python-dotenv
