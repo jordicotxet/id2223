@@ -1,6 +1,6 @@
 import modal
     
-LOCAL=False
+LOCAL=True
 
 if LOCAL == False:
    stub = modal.Stub("Daily_Batch_Inference")
@@ -98,7 +98,7 @@ def g():
 
     print("Number of different wine predictions to date: " + str(predictions.value_counts().count()))
     if predictions.value_counts().count() == 3:
-        results = confusion_matrix(labels, predictions, normalize='all')
+        results = confusion_matrix(labels, predictions)
 
         df_cm = pd.DataFrame(results, 
                                 ['Poor', 'Fair', 'Good'],

@@ -45,9 +45,9 @@ demo = gr.Interface(
         gr.Slider(minimum=0, maximum=100, step=0.1, value=5.9, label="residual sugar"),
         gr.Slider(minimum=0, maximum=0.5, step=0.001, value=0.046, label="chlorides"),
         gr.Slider(minimum=0, maximum=400, step=1, value=35, label="free_sulfur_dioxide"),
-        gr.Slider(minimum=2, maximum=15, step=0.1, value=10.6, label="alcohol (in %)"),
+        gr.Slider(minimum=2, maximum=15, step=0.1, value=10.6, label="alcohol (in %)"), 
         ],
-    examples=[[0.5, 0.8, 0.034, 46, 9.2],[0.42, 4.1, 0.03, 31, 12.8], [0.7, 67.1, 0.219, 275, 12.9]],
+    examples=[[0.5, 0.8, 0.034, 46, 9.2],[0.54, 14, 0.142, 31, 12], [0.15, 67.1, 0.035, 131, 14.1]],
     outputs=gr.Image(type="pil", height=400, width=400))
 
 demo.launch(share = True)
