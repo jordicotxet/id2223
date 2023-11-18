@@ -18,16 +18,30 @@ try:
 except:
     print("Featureview deletion unsuccessful")
 
-wine_fg = fs.get_feature_group(
-    name="wine",
-    version=1)
-wine_fg.delete()
+try:
+    wine_fg = fs.get_feature_group(
+        name="wine_predictions",
+        version=1)
+    wine_fg.delete()
+except:
+    pass
 
-for key in [0, 1, 2]:
-    fg = fs.get_feature_group(
-    name="wine_subset_" + str(int(key)),
-    version=1)
-    fg.delete()
+try:
+    wine_fg = fs.get_feature_group(
+        name="wine",
+        version=1)
+    wine_fg.delete()
+except:
+    pass
+
+try:
+    for key in [0, 1, 2]:
+        fg = fs.get_feature_group(
+        name="wine_subset_" + str(int(key)),
+        version=1)
+        fg.delete()
+except:
+    pass
 
 
 

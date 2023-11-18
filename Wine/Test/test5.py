@@ -21,21 +21,6 @@ from sklearn.metrics import confusion_matrix
 
 import numpy as np
 
-def generate_wine(stats, N):
-    """
-    Returns randomly generated wine of a particular quality based on its statistics 
-    """
-    import pandas as pd
-    import random
-
-    df_dict = {}
-
-    for row in stats:
-        df_dict[row['column']] = np.clip(np.random.normal(row['mean'], row['stdDev'], N), a_min=0.0, a_max=None)
-        #df_dict[row['column']] = np.random.uniform(row['minimum'], row['maximum'], N)
-
-    df = pd.DataFrame.from_dict(df_dict)
-    return df
 
 
 # fetch dataset 
@@ -49,6 +34,7 @@ for i in wine_quality_red.columns[wine_quality_red.isnull().any(axis=0)]:     #-
 wine_quality = wine_quality_white
 df_features = wine_quality
 
+df_features = wine_quality
 
 drop_col = ["fixed_acidity",
            "citric_acid",
@@ -74,10 +60,10 @@ X, y = df_features.iloc[:,:-1], df_features.iloc[:,-1:]
 
 v = y.values.squeeze()
 v1 = v
-v1 = np.select([v<6,v==6, v>6],[0,1,2])[:,None]
-#v1 = np.select([v<6, v>6],[0,1])[:,None]
-#v1 = np.select([v<=5,(v>5)&(v<=7), v>7],[0,1,2])[:,None]
 #v1 = np.select([v<6,v==6, v>6],[0,1,2])[:,None]
+v1 = np.select([v<6, v>6],[0,1])[:,None]
+#v1 = np.select([v<5,(v>=5)&(v<=6), v>6],[0,1,2])[:,None]
+#v1 = np.select([v<5,v==5, v==6,v==7,v>7],[0,1,2,3,4])[:,None]
 y = pd.DataFrame(v1, columns=["quality"])
 #X = X[['alcohol', 'sulphates']]
 
@@ -89,7 +75,7 @@ scaler = preprocessing.StandardScaler()
 #df_features = wine_quality.data.features
 
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
 #df4 = X_train.copy()
 #df4["quality"] = y_train.values
@@ -110,7 +96,7 @@ y_train = df4.iloc[:,-1:]  """
 us = RandomUnderSampler(sampling_strategy={0:1105,1:1100,2:738})
 sm = RandomOverSampler()
 #sm = SMOTE(sampling_strategy={0:2804,1:2804})
-sm = SMOTE(sampling_strategy={0:1205,1:1599,2:1500})
+#sm = SMOTE()
 print(np.unique(y_train.values, return_counts=True))
 #X_train, y_train = us.fit_resample(X_train, y_train)
 X_train, y_train = sm.fit_resample(X_train, y_train)
@@ -174,7 +160,7 @@ for i in range(3):
     stat_fg = fs.get_feature_group(name=name, version=1)
     stats = stat_fg.get_statistics().content['columns']
 
-    wines.append(generate_wine(stats, 50000))
+    wines.append(generate_wine(stats, 1000))
 
  
 generated = pd.concat(wines, ignore_index=True)

@@ -21,6 +21,12 @@ def g():
     import seaborn as sns
     import requests
 
+    quality_name = {
+        0:"Bad",
+        1:"Fair",
+        2:"Good"
+    }
+
     project = hopsworks.login()
     fs = project.get_feature_store()
 
@@ -70,8 +76,8 @@ def g():
         
     now = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
     data = {
-        'prediction': [wine_quality],
-        'label': [label],
+        'prediction': quality_name[wine_quality],
+        'label': quality_name[label],
         'datetime': [now],
        }
     monitor_df = pd.DataFrame(data)
@@ -95,8 +101,8 @@ def g():
         results = confusion_matrix(labels, predictions, normalize='all')
 
         df_cm = pd.DataFrame(results, 
-                                ['Poor', 'Average', 'Good'],
-                                ['Poor', 'Average', 'Good'])
+                                ['Poor', 'Fair', 'Good'],
+                                ['Poor', 'Fair', 'Good'])
 
         cm = sns.heatmap(df_cm, annot=True)
         cm.set(xlabel='Predicted', ylabel='Actual')

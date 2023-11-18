@@ -48,9 +48,16 @@ v = y.values.squeeze()
 v1 = np.select([v<6,v==6, v>6],[0,1,2])[:,None]
 y = pd.DataFrame(v1, columns=["quality"])
 
-X_val = X.values
-y_val = y.values
-df_data = np.concatenate((X_val, y_val), axis = 1)
+X_train = X.values
+y_train = y.values
+
+sm = SMOTE()
+
+print(np.unique(y_train, return_counts=True))
+X_train, y_train = sm.fit_resample(X_train, y_train)
+print(np.unique(y_train, return_counts=True))
+
+df_data = np.concatenate((X_train, y_train[:,None]), axis = 1)
 
 df = pd.DataFrame(df_data, columns=columns)
 
