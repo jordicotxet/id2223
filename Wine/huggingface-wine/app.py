@@ -24,14 +24,11 @@ def wine(volatile_acidity,
     df = pd.DataFrame([[volatile_acidity, residual_sugar, chlorides, free_sulfur_dioxide, alcohol]], 
                       columns=["volatile_acidity", "residual_sugar", "chlorides", "free_sulfur_dioxide", "alcohol"])
     print("Predicting")
-    print(df)
     # 'res' is a list of predictions returned as the label.
     res = model.predict(df) 
     # We add '[0]' to the result of the transformed 'res', because 'res' is a list, and we only want 
     # the first element.
-    print(res[0])
     wine_url = "https://github.com/jordicotxet/id2223/blob/63fe7d525afa1cfb626c9fa7513e2cc886e22d41/Wine/wine_dataset/" + str(int(res[0])) + ".jpg?raw=true"
-    print(wine_url)
     img = Image.open(requests.get(wine_url, stream=True).raw)  
     return img
         
